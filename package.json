@@ -1,4 +1,5 @@
 {
+  "homepage": ".",
   "name": "gensyn-identity",
   "private": true,
   "version": "0.0.0",
