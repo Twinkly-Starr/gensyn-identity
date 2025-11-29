@@ -1,60 +1,248 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gensyn Identity</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              gensyn: {
-                bg: '#0a0a0a',
-                primary: '#fad7d1',
-                secondary: '#230800',
-              }
-            },
-            fontFamily: {
-              mono: ['"Space Mono"', 'monospace'],
-              header: ['"VT323"', 'monospace'],
-            }
-          }
-        }
-      }
-    </script>
-    <style>
-      body {
-        background-color: #0a0a0a;
-        color: #ffffff;
-        overflow: hidden; /* Prevent scrolling on the main page */
-      }
-      /* Custom scrollbar for panels */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #230800; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #fad7d1; 
-      }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/"
-  }
-}
-</script>
-</head>
-  <body>
-    <div id="root"></div>
-  </body>
-</html>
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 <!DOCTYPE html>\
+<html lang="en">\
+<head>\
+    <meta charset="UTF-8">\
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+    <title>Gensyn Identity Protocol</title>\
+    \
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>\
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>\
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>\
+    <script src="https://cdn.tailwindcss.com"></script>\
+\
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">\
+\
+    <style>\
+        body \{ background-color: #0a0a0a; font-family: 'Space Mono', monospace; \}\
+        /* Custom Scrollbar for Chrome/Safari */\
+        ::-webkit-scrollbar \{ width: 8px; \}\
+        ::-webkit-scrollbar-track \{ background: #230800; \}\
+        ::-webkit-scrollbar-thumb \{ background: #fad7d1; border-radius: 4px; \}\
+        .cyber-border \{ box-shadow: 0 0 10px rgba(250, 215, 209, 0.2); \}\
+    </style>\
+</head>\
+<body>\
+\
+    <div id="root"></div>\
+\
+    <script type="text/babel">\
+        const \{ useState, useEffect, useRef \} = React;\
+\
+        function App() \{\
+            // --- STATE ---\
+            const [imageSrc, setImageSrc] = useState(null);\
+            const [logoUrl, setLogoUrl] = useState(null); // No default logo initially\
+            \
+            // Sliders\
+            const [glitchIntensity, setGlitchIntensity] = useState(20);\
+            const [noiseIntensity, setNoiseIntensity] = useState(15);\
+            const [ditherType, setDitherType] = useState('threshold'); // none, threshold, noise\
+            const [logoSize, setLogoSize] = useState(20);\
+\
+            const canvasRef = useRef(null);\
+            \
+            // --- LOGO PRESETS ---\
+            const PRESETS = \{\
+                white: "https://i.postimg.cc/QNcnw0Zd/Gensyn-Logo-Inline-White.png", //\
+                brown: "https://i.postimg.cc/DZxb0PFt/Gensyn-Logo-Inline-Brown.png", //\
+                pink:  "https://i.postimg.cc/DZp8nfdx/Gensyn-Logo-Inline-Pink.png"  //\
+            \};\
+\
+            // --- INITIAL LOAD ---\
+            useEffect(() => \{\
+                // Load a placeholder image so it's not empty\
+                const img = new Image();\
+                img.src = 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop';\
+                img.crossOrigin = "Anonymous";\
+                img.onload = () => setImageSrc(img);\
+            \}, []);\
+\
+            // --- RENDER PIPELINE (The "Brain") ---\
+            useEffect(() => \{\
+                renderCanvas();\
+            \}, [imageSrc, logoUrl, glitchIntensity, noiseIntensity, ditherType, logoSize]);\
+\
+            const renderCanvas = () => \{\
+                const canvas = canvasRef.current;\
+                if (!canvas || !imageSrc) return;\
+                const ctx = canvas.getContext('2d');\
+\
+                // 1. Set Canvas Size to match Image\
+                canvas.width = imageSrc.width;\
+                canvas.height = imageSrc.height;\
+                const w = canvas.width;\
+                const h = canvas.height;\
+\
+                // 2. Clear & Draw Base\
+                ctx.clearRect(0, 0, w, h);\
+                ctx.drawImage(imageSrc, 0, 0, w, h);\
+\
+                // 3. Apply Glitch (Slice Effect)\
+                if (glitchIntensity > 0) \{\
+                    const slices = Math.floor(glitchIntensity / 2);\
+                    const maxOffset = w * (glitchIntensity / 100) * 0.1;\
+                    \
+                    for (let i = 0; i < slices; i++) \{\
+                        const sy = Math.random() * h;\
+                        const sh = Math.random() * (h * 0.1);\
+                        const dx = (Math.random() - 0.5) * maxOffset;\
+                        ctx.drawImage(canvas, 0, sy, w, sh, dx, sy, w, sh);\
+                    \}\
+                \}\
+\
+                // 4. Get Data for Pixel Manipulations\
+                const imageData = ctx.getImageData(0, 0, w, h);\
+                const data = imageData.data;\
+\
+                // 5. Apply Noise\
+                if (noiseIntensity > 0) \{\
+                    const factor = noiseIntensity * 2.55;\
+                    for (let i = 0; i < data.length; i += 4) \{\
+                        const random = (0.5 - Math.random()) * factor;\
+                        data[i] += random;     // R\
+                        data[i+1] += random;   // G\
+                        data[i+2] += random;   // B\
+                    \}\
+                \}\
+\
+                // 6. Apply Dither\
+                if (ditherType === 'threshold') \{\
+                    for (let i = 0; i < data.length; i += 4) \{\
+                        const avg = (data[i] + data[i+1] + data[i+2]) / 3;\
+                        const val = avg > 128 ? 255 : 0;\
+                        data[i] = data[i+1] = data[i+2] = val;\
+                    \}\
+                \}\
+\
+                // Put the dirty pixels back\
+                ctx.putImageData(imageData, 0, 0);\
+\
+                // 7. Draw Logo (Last Layer - Stays Sharp!)\
+                if (logoUrl) \{\
+                    const logo = new Image();\
+                    logo.crossOrigin = "Anonymous";\
+                    logo.src = logoUrl;\
+                    // We need to wait for logo to load, but since it's cached it's usually fast.\
+                    // For perfect stability in this simple script, we assume it loads fast or re-triggers.\
+                    // A proper implementation would pre-load. Here we just try-draw.\
+                    if (logo.complete) \{\
+                        const logoW = w * (logoSize / 100);\
+                        const logoH = logoW * (logo.height / logo.width);\
+                        const padding = w * 0.05;\
+                        ctx.drawImage(logo, w - logoW - padding, h - logoH - padding, logoW, logoH);\
+                    \} else \{\
+                        logo.onload = () => renderCanvas(); // Redraw when logo is ready\
+                    \}\
+                \}\
+            \};\
+\
+            // --- HANDLERS ---\
+            const handleImageUpload = (e) => \{\
+                const file = e.target.files[0];\
+                if (file) \{\
+                    const reader = new FileReader();\
+                    reader.onload = (event) => \{\
+                        const img = new Image();\
+                        img.onload = () => setImageSrc(img);\
+                        img.src = event.target.result;\
+                    \};\
+                    reader.readAsDataURL(file);\
+                \}\
+            \};\
+\
+            const downloadImage = () => \{\
+                const link = document.createElement('a');\
+                link.download = 'gensyn_identity.png';\
+                link.href = canvasRef.current.toDataURL('image/png');\
+                link.click();\
+            \};\
+\
+            return (\
+                <div className="flex flex-col md:flex-row min-h-screen text-white">\
+                    \
+                    \{/* CANVAS AREA (Top on mobile, Left on desktop) */\}\
+                    <div className="w-full md:w-[65%] bg-black flex items-center justify-center p-4 order-1">\
+                        <div className="relative border-2 border-[#fad7d1] cyber-border max-w-full">\
+                           <canvas ref=\{canvasRef\} className="max-w-full h-auto block" />\
+                           \{!imageSrc && <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[#fad7d1]">LOADING...</p>\}\
+                        </div>\
+                    </div>\
+\
+                    \{/* CONTROL DECK (Bottom on mobile, Right on desktop) */\}\
+                    <div className="w-full md:w-[35%] bg-[#230800] border-l border-[#fad7d1] p-6 flex flex-col gap-8 overflow-y-auto max-h-[50vh] md:max-h-screen order-2">\
+                        \
+                        <h1 className="text-4xl font-['VT323'] text-[#fad7d1] text-center mb-2">/// GENSYN PROTOCOL</h1>\
+\
+                        \{/* SECTION 1: IDENTITY */\}\
+                        <div className="flex flex-col gap-4">\
+                            <label className="text-[#fad7d1] text-xs uppercase tracking-widest border-b border-[#fad7d1] pb-1">>> Step 1: Identity Source</label>\
+                            \
+                            \{/* Logo Presets */\}\
+                            <div className="grid grid-cols-3 gap-2">\
+                                <button onClick=\{() => setLogoUrl(PRESETS.white)\} className=\{`h-12 border $\{logoUrl === PRESETS.white ? 'bg-[#fad7d1] text-black' : 'border-[#fad7d1] text-[#fad7d1]'\} hover:bg-[#fad7d1] hover:text-black transition-all font-bold text-xs`\}>WHT</button>\
+                                <button onClick=\{() => setLogoUrl(PRESETS.black)\} className=\{`h-12 border $\{logoUrl === PRESETS.black ? 'bg-[#fad7d1] text-black' : 'border-[#fad7d1] text-[#fad7d1]'\} hover:bg-[#fad7d1] hover:text-black transition-all font-bold text-xs`\}>BLK</button>\
+                                <button onClick=\{() => setLogoUrl(PRESETS.pink)\}  className=\{`h-12 border $\{logoUrl === PRESETS.pink ? 'bg-[#fad7d1] text-black' : 'border-[#fad7d1] text-[#fad7d1]'\} hover:bg-[#fad7d1] hover:text-black transition-all font-bold text-xs`\}>PNK</button>\
+                            </div>\
+\
+                            \{/* Upload Button */\}\
+                            <div className="relative">\
+                                <input type="file" onChange=\{handleImageUpload\} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />\
+                                <button className="w-full py-3 border border-dashed border-[#fad7d1] text-[#fad7d1] hover:bg-[#331100] transition-colors uppercase text-xs">\
+                                    [ Upload Subject Image ]\
+                                </button>\
+                            </div>\
+                        </div>\
+\
+                        \{/* SECTION 2: SIGNAL MODULATION */\}\
+                        <div className="flex flex-col gap-6">\
+                            <label className="text-[#fad7d1] text-xs uppercase tracking-widest border-b border-[#fad7d1] pb-1">>> Step 2: Signal Modulation</label>\
+                            \
+                            \{/* Glitch Slider */\}\
+                            <div>\
+                                <div className="flex justify-between text-xs mb-2 text-[#fad7d1]"><span>GLITCH_INTENSITY</span> <span>\{glitchIntensity\}%</span></div>\
+                                <input type="range" min="0" max="100" value=\{glitchIntensity\} onChange=\{(e) => setGlitchIntensity(parseInt(e.target.value))\} className="w-full accent-[#fad7d1] h-1 bg-gray-800 appearance-none cursor-pointer" />\
+                            </div>\
+\
+                            \{/* Noise Slider */\}\
+                            <div>\
+                                <div className="flex justify-between text-xs mb-2 text-[#fad7d1]"><span>SIGNAL_NOISE</span> <span>\{noiseIntensity\}%</span></div>\
+                                <input type="range" min="0" max="100" value=\{noiseIntensity\} onChange=\{(e) => setNoiseIntensity(parseInt(e.target.value))\} className="w-full accent-[#fad7d1] h-1 bg-gray-800 appearance-none cursor-pointer" />\
+                            </div>\
+\
+                            \{/* Logo Size */\}\
+                            <div>\
+                                <div className="flex justify-between text-xs mb-2 text-[#fad7d1]"><span>LOGO_SCALE</span> <span>\{logoSize\}%</span></div>\
+                                <input type="range" min="5" max="50" value=\{logoSize\} onChange=\{(e) => setLogoSize(parseInt(e.target.value))\} className="w-full accent-[#fad7d1] h-1 bg-gray-800 appearance-none cursor-pointer" />\
+                            </div>\
+\
+                            \{/* Dither Mode */\}\
+                            <div className="flex gap-2">\
+                                <label className="text-xs text-[#fad7d1] flex items-center gap-2 cursor-pointer">\
+                                    <input type="checkbox" checked=\{ditherType === 'threshold'\} onChange=\{() => setDitherType(ditherType === 'threshold' ? 'none' : 'threshold')\} className="accent-[#fad7d1]" />\
+                                    ENABLE THRESHOLD DITHER\
+                                </label>\
+                            </div>\
+                        </div>\
+\
+                        \{/* EXPORT */\}\
+                        <button onClick=\{downloadImage\} className="mt-auto w-full py-4 bg-[#fad7d1] text-[#230800] font-bold text-lg hover:bg-white hover:scale-[1.02] transition-transform shadow-[0_0_15px_rgba(250,215,209,0.4)]">\
+                            >> DOWNLOAD IDENTITY FILE\
+                        </button>\
+                        \
+                    </div>\
+                </div>\
+            );\
+        \}\
+\
+        const root = ReactDOM.createRoot(document.getElementById('root'));\
+        root.render(<App />);\
+    </script>\
+</body>\
+</html>}
